@@ -1,0 +1,25 @@
+{
+  "name": "audiomap",
+  "private": true,
+  "dependencies": {
+    "firebase": "3.7.3",
+    "next": "^2.0.0-beta",
+    "react": "15.4.2",
+    "react-dom": "15.4.2",
+    "react-google-maps": "6.0.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "7.0.0",
+    "standard": "8.4.0"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "NODE_ENV=production next start",
+    "lint": "standard",
+    "deploy": "now"
+  }
+}
