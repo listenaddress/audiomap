@@ -8,8 +8,9 @@ const AsyncMap = withScriptjs(
   withGoogleMap(props => (
     <div>
       <GoogleMap
+        ref={props.onMapLoad}
         defaultZoom={15}
-        defaultCenter={{ lat: 37.76026565039252, lng: -122.42709160374943 }}
+        defaultCenter={props.userLocation ? props.userLocation : { lat: 37.76026565039252, lng: -122.42709160374943 }}
         onClick={props.onMapClick}
       >
         {props.markers.map(marker => (
@@ -19,6 +20,14 @@ const AsyncMap = withScriptjs(
             onClick={() => props.onMarkerClick(marker)}
           />
         ))}
+        {
+          props.userLocation &&
+            <InfoWindow
+              children={<h2>You're here</h2>}
+              position={props.userLocation}
+            />
+
+        }
       </GoogleMap>
     </div>
   ))
@@ -49,17 +58,9 @@ export default class extends React.Component {
     Router.push('/')
   }
 
-  handleMapLoad = this.handleMapLoad.bind(this)
   handleMapClick = this.handleMapClick.bind(this)
   handleMarkerClick = this.handleMarkerClick.bind(this)
   handleMarkerRightClick = this.handleMarkerRightClick.bind(this)
-
-  handleMapLoad(map) {
-    this._mapComponent = map
-    if (map) {
-      console.log(map.getZoom())
-    }
-  }
 
   handleMapClick(event) {
     const position = {
@@ -90,11 +91,11 @@ export default class extends React.Component {
   render () {
     return (
       <div style={{ height: `100vh`, width: `100vw` }}>
+        <div className="info">click to record audio on this immaculate google map thx 4 bein you</div>
         <AsyncMap
           googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0V1PJO-7iIm5vphhZXw_VfBgMtJDntn4&libraries=places"
           loadingElement={
             <div style={{ height: `100%` }}>
-              <h1>loading...</h1>
             </div>
           }
           containerElement={
@@ -109,30 +110,20 @@ export default class extends React.Component {
           markerInput={this.state.markerInput}
           onMarkerClick={this.handleMarkerClick}
           onMarkerRightClick={this.handleMarkerClick}
+          userLocation={this.props.userLocation}
         />
+        <style jsx>{`
+          .info {
+            position: absolute;
+            right: 30px;
+            top: 10px;
+            font-size: 18px;
+            border: 1px solid;
+            background-color: wheat;
+            z-index: 1;
+          }
+        `}</style>
       </div>
     )
   }
 }
-
-// <SearchBox
-//   controlPosition={window.google.maps.ControlPosition.TOP_CENTER}
-//   inputPlaceholder="Customized your placeholder"
-// />
-
-// {props.markerInput.map(marker => (
-//   <div>
-//     <Marker
-//       {...marker}
-//     />
-//     <InfoWindow
-//       position={marker.position}
-//       options={{pixelOffset: new google.maps.Size(0,-30)}}
-//     >
-//       <div>
-//         <button>Record</button>
-//         <marquee>/\/\___/\______/\</marquee>
-//       </div>
-//     </InfoWindow>
-//   </div>
-// ))}

@@ -42,9 +42,9 @@ export default class extends React.Component {
   }
 
   setMarker = this.setMarker.bind(this)
+  setUserLocation = this.setUserLocation.bind(this)
 
   setMarker () {
-    console.log('arguments', arguments[0])
     const nextMarkers = [
       ...this.state.markers, arguments[0],
     ]
@@ -54,13 +54,45 @@ export default class extends React.Component {
     Router.push('/')
   }
 
+  setUserLocation (userLocation) {
+    this.setState({userLocation})
+    this.setState({userLocationSet: true})
+  }
+
+  componentDidMount () {
+    const self = this
+    if (navigator && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        }
+
+        self.setUserLocation(pos)
+        // map.panTo(pos);
+      }, function(err) {
+        self.setUserLocation()
+      })
+    } else {
+      self.setUserLocation()
+      // Browser doesn't support Geolocation
+      handleLocationError(false, infoWindow, map.getCenter())
+    }
+  }
+
   render () {
     const { url, photos, markers, markerInput } = this.props
 
     return (
       <div>
-        <div className="info">click to record audio on this immaculate google map thx 4 bein you</div>
-        <Map markers={this.state.markers} markerInput={markerInput}/>
+        {
+          !this.state.userLocationSet &&
+            <img className="sloth" src="https://media3.giphy.com/media/3o85xoAqCYK8OLDfdC/giphy.gif" alt="Finger Industries music happy dancing sloth GIF" />
+        }
+        {
+          this.state.userLocationSet &&
+            <Map markers={this.state.markers} markerInput={markerInput} userLocation={this.state.userLocation}/>
+        }
         {
           url.query.record &&
             <Modal
@@ -85,17 +117,15 @@ export default class extends React.Component {
             overflow-y: hidden;
             margin: 0px;
           }
-          .info {
-            position: absolute;
-            right: 30px;
-            top: 10px;
-            border: 1px solid;
-            background-color: wheat;
-            z-index: 1;
-          }
           .list {
             padding: 50px;
             text-align: center;
+          }
+
+          .sloth {
+            position: absolute;
+            left: 20%;
+            top: 20%;
           }
 
           .photo {
