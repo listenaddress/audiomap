@@ -23,7 +23,20 @@ const AsyncMap = withScriptjs(
         {
           props.userLocation && !props.queryParams &&
             <InfoWindow
-              children={<h2>You're here</h2>}
+              children={
+                <div>
+                  <h2>You're here</h2>
+                  <button
+                    onClick={() =>
+                      Router.push(
+                        `/?record=true&lat=${props.userLocation.lat}&lng=${props.userLocation.lng}`,
+                        `/?record=true&lat=${props.userLocation.lat}&lng=${props.userLocation.lng}`
+                      )}
+                  >
+                    Record something
+                  </button>
+                </div>
+              }
               position={props.userLocation}
             />
         }
