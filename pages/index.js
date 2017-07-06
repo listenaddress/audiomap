@@ -1,12 +1,10 @@
 import React from 'react'
 import Router from 'next/router'
 import { withGoogleMap } from 'react-google-maps'
-
 import Modal from '../components/modal'
-
 import Map from '../components/map'
-
 import getEntries from '../lib/get-entries'
+let queryParams
 
 export default class extends React.Component {
   static async getInitialProps () {
@@ -22,6 +20,35 @@ export default class extends React.Component {
     super(props)
     this.state = {
       markers: props.markers
+    }
+  }
+
+  componentWillMount () {
+    const { url } = this.props
+
+    if (url.query.lat && url.query.lng) {
+      queryParams = {
+        lat : Number(url.query.lat),
+        lng: Number(url.query.lng)
+      }
+    }
+  }
+
+  componentDidMount () {
+    const self = this
+    if (navigator && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        self.setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        })
+      }, function(err) {
+        self.setUserLocation()
+      })
+    } else {
+      self.setUserLocation()
+      // Browser doesn't support Geolocation
+      handleLocationError(false, infoWindow, map.getCenter())
     }
   }
 
@@ -59,27 +86,6 @@ export default class extends React.Component {
     this.setState({userLocationSet: true})
   }
 
-  componentDidMount () {
-    const self = this
-    if (navigator && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        var pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        }
-
-        self.setUserLocation(pos)
-        // map.panTo(pos);
-      }, function(err) {
-        self.setUserLocation()
-      })
-    } else {
-      self.setUserLocation()
-      // Browser doesn't support Geolocation
-      handleLocationError(false, infoWindow, map.getCenter())
-    }
-  }
-
   render () {
     const { url, photos, markers, markerInput } = this.props
 
@@ -87,11 +93,11 @@ export default class extends React.Component {
       <div>
         {
           !this.state.userLocationSet &&
-            <img className="sloth" src="https://media3.giphy.com/media/3o85xoAqCYK8OLDfdC/giphy.gif" alt="Finger Industries music happy dancing sloth GIF" />
+            <img className="loadingImage" src="https://web.archive.org/web/20091024052842/http://www.geocities.com/al_3abarat/Audio.gif"/>
         }
         {
           this.state.userLocationSet &&
-            <Map markers={this.state.markers} markerInput={markerInput} userLocation={this.state.userLocation}/>
+            <Map markers={this.state.markers} markerInput={markerInput} userLocation={this.state.userLocation} queryParams={queryParams}/>
         }
         {
           url.query.record &&
@@ -117,15 +123,16 @@ export default class extends React.Component {
             overflow-y: hidden;
             margin: 0px;
           }
+
           .list {
             padding: 50px;
             text-align: center;
           }
 
-          .sloth {
+          .loadingImage {
             position: absolute;
             left: 20%;
-            top: 20%;
+            top: 35%;
           }
 
           .photo {

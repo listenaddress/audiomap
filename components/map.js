@@ -1,8 +1,8 @@
 import { default as React, Component } from 'react'
 import { withGoogleMap, GoogleMap, Marker, places, InfoWindow } from 'react-google-maps'
-import withScriptjs from "react-google-maps/lib/async/withScriptjs"
-import SearchBox from "react-google-maps/lib/places/SearchBox"
+import withScriptjs from 'react-google-maps/lib/async/withScriptjs'
 import Router from 'next/router'
+let defaultCenter
 
 const AsyncMap = withScriptjs(
   withGoogleMap(props => (
@@ -10,7 +10,7 @@ const AsyncMap = withScriptjs(
       <GoogleMap
         ref={props.onMapLoad}
         defaultZoom={15}
-        defaultCenter={props.userLocation ? props.userLocation : { lat: 37.76026565039252, lng: -122.42709160374943 }}
+        defaultCenter={props.defaultCenter}
         onClick={props.onMapClick}
       >
         {props.markers.map(marker => (
@@ -21,12 +21,11 @@ const AsyncMap = withScriptjs(
           />
         ))}
         {
-          props.userLocation &&
+          props.userLocation && !props.queryParams &&
             <InfoWindow
               children={<h2>You're here</h2>}
               position={props.userLocation}
             />
-
         }
       </GoogleMap>
     </div>
@@ -43,6 +42,20 @@ export default class extends React.Component {
   constructor (props) {
     super(props)
     this.state = { markerInput: [] }
+  }
+
+
+  // Set map's defaultCenter to the params in the url if they're there
+  // Otherwise set it to the users location if it's given
+  // Otherwise set it to Dolores Park
+  componentWillMount() {
+    if (this.props.queryParams) {
+      defaultCenter = this.props.queryParams
+      return
+    }
+
+    defaultCenter = this.props.userLocation ?
+      this.props.userLocation : { lat: 37.76026565039252, lng: -122.42709160374943 }
   }
 
   componentDidMount () {
@@ -111,6 +124,8 @@ export default class extends React.Component {
           onMarkerClick={this.handleMarkerClick}
           onMarkerRightClick={this.handleMarkerClick}
           userLocation={this.props.userLocation}
+          defaultCenter={defaultCenter}
+          queryParams={this.props.queryParams}
         />
         <style jsx>{`
           .info {
