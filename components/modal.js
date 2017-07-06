@@ -115,6 +115,13 @@ export default class extends React.Component {
                 </div>
               }
               {
+                this.state.src &&
+                <div>
+                  <button onClick={this.save}>save</button>
+                  <button onClick={this.cancel}>cancel</button>
+                </div>
+              }
+              {
                 this.state.recording &&
                 <p>🎤</p>
               }
@@ -129,20 +136,6 @@ export default class extends React.Component {
                 this.state.marker &&
                 <audio autoPlay="true" controls="true" src={this.state.marker.audio}></audio>
               }
-            </div>
-
-            <div className='sidebar'>
-              <ul className='sidebarList'>
-                <li>
-                  {
-                    this.state.src &&
-                    <div>
-                      <button onClick={this.save}>save</button>
-                      <button onClick={this.cancel}>cancel</button>
-                    </div>
-                  }
-                </li>
-              </ul>
             </div>
           </div>
         </div>
@@ -165,7 +158,7 @@ export default class extends React.Component {
           }
 
           .post {
-            width: 800px;
+            width: 600px;
             overflow: hidden;
             height: 500px;
             display: table;
