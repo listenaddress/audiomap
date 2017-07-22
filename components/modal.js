@@ -25,7 +25,6 @@ export default class extends React.Component {
   getUserMedia () {
     navigator.mediaDevices.getUserMedia({audio:true})
       .then(stream => {
-        console.log('stream', stream)
         rec = new MediaRecorder(stream)
         rec.ondataavailable = e => {
           audioChunks.push(e.data)
@@ -33,12 +32,6 @@ export default class extends React.Component {
             blob = new Blob(audioChunks,{type:'audio/x-mpeg-3'})
             const src = URL.createObjectURL(blob)
             this.setState({ src })
-            console.log('src', src)
-            // recordedAudio.controls = true
-            // recordedAudio.autoplay = true
-            // audioDownload.href = recordedAudio.src
-            // audioDownload.download = 'mp3'
-            // audioDownload.innerHTML = 'download'
           }
         }
       })
@@ -53,7 +46,6 @@ export default class extends React.Component {
 
   start () {
     audioChunks = [];
-    console.log('starting')
     this.setState({ recording: true })
     rec.start()
   }
@@ -69,12 +61,8 @@ export default class extends React.Component {
       lng: Number(this.props.url.query.lng),
     }
     const onSave = this.props.onSave
-    console.log('onSave', onSave)
-    console.log('position', position)
-    console.log('blob', blob)
+
     setEntry(position, blob).then(function (marker) {
-      console.log('onSave', onSave)
-      console.log('marker', marker)
       onSave(marker)
     })
   }
@@ -84,19 +72,16 @@ export default class extends React.Component {
   }
 
   componentDidMount () {
-    // document.addEventListener('keydown', this.onKeyDown)
     this.getUserMedia()
     this.setPost(this.props)
   }
 
   setPost (props) {
     if (!props.markers) return
-    console.log('setting post')
     const marker = props.markers.filter(function (obj) {
       return obj.key === props.url.query.key
     })
 
-    console.log('setting marker', marker)
     this.setState({ marker: marker[0] })
   }
 
